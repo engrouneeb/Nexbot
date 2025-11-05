@@ -1,0 +1,49 @@
+<button 
+  class="chat-toggle-button" 
+  [class.hidden]="isOpen"
+  (click)="toggleChat()"
+  [style.background]="primaryColor">
+  💬
+</button>
+
+<div class="chat-container" [class.open]="isOpen">
+  <div class="chat-header" [style.background]="primaryColor">
+    <div class="header-content">
+      <div class="bot-avatar">🤖</div>
+      <h3>{{ botName }}</h3>
+    </div>
+    <button class="close-button" (click)="closeChat()">✕</button>
+  </div>
+
+  <div class="messages-container">
+    <div *ngFor="let message of messages" 
+         class="message"
+         [class.user-message]="message.role === 'user'"
+         [class.assistant-message]="message.role === 'assistant'">
+      <div class="message-content">{{ message.content }}</div>
+    </div>
+
+    <div *ngIf="isLoading" class="message assistant-message">
+      <div class="typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <input 
+      type="text" 
+      [(ngModel)]="userMessage"
+      (keypress)="onKeyPress($event)"
+      [disabled]="isLoading"
+      placeholder="Type your message..."
+      class="message-input">
+    <button 
+      (click)="sendMessage()"
+      [disabled]="!userMessage.trim() || isLoading"
+      [style.background]="primaryColor"
+      class="send-button">
+      ➤
+    </button>
+  </div>
+</div>

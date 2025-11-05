@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalimaticChatBot Widget Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .demo-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-card">
+        <h1>🤖 CalimaticChatBot Widget Demo</h1>
+        <p>Standalone Angular widget that can be embedded anywhere!</p>
+        
+        <h2>Installation</h2>
+        <div class="code-block">
+            &lt;!-- Include the widget script --&gt;<br>
+            &lt;script src="chatbot-widget.js"&gt;&lt;/script&gt;<br><br>
+            &lt;!-- Add the widget to your page --&gt;<br>
+            &lt;calimatic-chatbot-widget<br>
+            &nbsp;&nbsp;bot-id="your-bot-id"<br>
+            &nbsp;&nbsp;api-url="http://localhost:5000/api/public"<br>
+            &nbsp;&nbsp;primary-color="#6366f1"<br>
+            &nbsp;&nbsp;bot-name="Assistant"<br>
+            &gt;&lt;/calimatic-chatbot-widget&gt;
+        </div>
+    </div>
+
+    <!-- Include the compiled widget -->
+    <script src="../dist/widget/browser/main.js"></script>
+    
+    <!-- Add the chatbot widget -->
+    <calimatic-chatbot-widget
+        bot-id="demo-bot-123"
+        primary-color="#6366f1"
+        bot-name="CaliBot"
+        welcome-message="Hi! I'm CaliBot. How can I assist you today?"
+    ></calimatic-chatbot-widget>
+</body>
+</html>
