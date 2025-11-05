@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # ChromaDB - Vector Database
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chatbot-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+    networks:
+      - chatbot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis - Caching and Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: chatbot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-chatbotRedis123}
+    networks:
+      - chatbot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # SQL Server - Primary Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: chatbot-sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - SA_PASSWORD=${SQL_SERVER_PASSWORD:-YourStrong@Password123}
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - chatbot-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SQL_SERVER_PASSWORD:-YourStrong@Password123} -Q 'SELECT 1' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # .NET API (uncomment when ready to containerize)
+  # api:
+  #   build:
+  #     context: ../../src/backend/API
+  #     dockerfile: Dockerfile
+  #   container_name: chatbot-api
+  #   ports:
+  #     - "5000:80"
+  #     - "5001:443"
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ConnectionStrings__DefaultConnection=${SQL_SERVER_CONNECTION_STRING}
+  #     - Redis__ConnectionString=${REDIS_CONNECTION_STRING}
+  #     - ChromaDB__Url=http://chromadb:8000
+  #   depends_on:
+  #     - sqlserver
+  #     - redis
+  #     - chromadb
+  #   networks:
+  #     - chatbot-network
+
+  # Angular Admin Dashboard (uncomment when ready to containerize)
+  # dashboard:
+  #   build:
+  #     context: ../../src/frontend/admin-dashboard
+  #     dockerfile: Dockerfile
+  #   container_name: chatbot-dashboard
+  #   ports:
+  #     - "4200:80"
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - chatbot-network
+
+networks:
+  chatbot-network:
+    driver: bridge
+
+volumes:
+  chromadb-data:
+    driver: local
+  redis-data:
+    driver: local
+  sqlserver-data:
+    driver: local
