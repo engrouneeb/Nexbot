@@ -10,3 +10,6 @@
 /Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/obj/Debug/net9.0/refint/ChatbotPlatform.Core.dll
 /Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/obj/Debug/net9.0/ChatbotPlatform.Core.pdb
 /Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/obj/Debug/net9.0/ref/ChatbotPlatform.Core.dll
+/Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/obj/Debug/net9.0/ChatbotPlatform.Core.csproj.AssemblyReference.cache
+/Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/bin/Debug/net9.0/ChatbotPlatform.Core.runtimeconfig.json
+/Users/affanlaptops/Desktop/Ouneeb/Nexbot/src/backend/ChatbotPlatform.Core/obj/Debug/net9.0/ChatbotPlatform.Core.genruntimeconfig.cache

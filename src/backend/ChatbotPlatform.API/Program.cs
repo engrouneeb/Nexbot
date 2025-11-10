@@ -1,31 +1,52 @@
+using ChatbotPlatform.Core.Data;
+using ChatbotPlatform.Core.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Configure Database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorCodesToAdd: null
+        )
+    )
+);
+
+// Configure Identity
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "http://localhost:3000")
-              .AllowAnyHeader()
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "CalimaticChatBot API",
-        Version = "v1",
-        Description = "Multi-Tenant AI Chatbot Platform API"
+              .AllowAnyHeader();
     });
 });
 
@@ -35,42 +56,33 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CalimaticChatBot API V1");
-        c.RoutePrefix = "swagger";
-    });
+    app.UseSwaggerUI();
+
+    // TODO: Fix database connection issue before enabling seeding
+    // using (var scope = app.Services.CreateScope())
+    // {
+    //     var services = scope.ServiceProvider;
+    //     try
+    //     {
+    //         DbInitializer.SeedAsync(services).Wait();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         var logger = services.GetRequiredService<ILogger<Program>>();
+    //         logger.LogError(ex, "An error occurred seeding the database.");
+    //     }
+    // }
 }
 
-// Only use HTTPS redirection in production
+// Disable HTTPS redirect in development
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 
-app.UseCors();
-
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
-// Health check endpoint
-app.MapGet("/api/health", () => Results.Ok(new 
-{ 
-    status = "healthy", 
-    timestamp = DateTime.UtcNow,
-    version = "1.0.0",
-    service = "CalimaticChatBot API",
-    environment = app.Environment.EnvironmentName
-}));
-
-// Root endpoint
-app.MapGet("/", () => Results.Ok(new
-{
-    message = "CalimaticChatBot API is running!",
-    version = "1.0.0",
-    swagger = "/swagger",
-    health = "/api/health"
-}));
 
 app.Run();

@@ -26,17 +26,26 @@ services:
     networks:
       - calimatic-network
 
-  sqlserver:
-    image: mcr.microsoft.com/azure-sql-edge:latest
-    container_name: calimatic-sqlserver
+  postgres:
+    image: postgres:16-alpine
+    container_name: calimatic-postgres
+    platform: linux/arm64
     ports:
-      - "1434:1433"
+      - "5432:5432"
     environment:
-      - ACCEPT_EULA=1
-      - MSSQL_SA_PASSWORD=YourStrong@Password123
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=YourStrong@Passw0rd
+      - POSTGRES_DB=CalimaticChatbotDB
+      - POSTGRES_HOST_AUTH_METHOD=md5
     volumes:
-      - sqlserver-data:/var/opt/mssql
+      - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     networks:
       - calimatic-network
 
@@ -45,7 +54,7 @@ volumes:
     driver: local
   redis-data:
     driver: local
-  sqlserver-data:
+  postgres-data:
     driver: local
 
 networks:
