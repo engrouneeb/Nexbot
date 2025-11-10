@@ -64,7 +64,7 @@ docker exec chatbot-redis redis-cli ping > /dev/null 2>&1 && echo "✓ Redis is 
 # Test SQL Server
 echo "Testing SQL Server connection..."
 sleep 5  # Give SQL Server more time
-docker exec chatbot-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Password123" -Q "SELECT 1" > /dev/null 2>&1 && echo "✓ SQL Server is running" || echo "✗ SQL Server connection failed"
+docker exec chatbot-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "" -Q "SELECT 1" > /dev/null 2>&1 && echo "✓ SQL Server is running" || echo "✗ SQL Server connection failed"
 
 cd ../..
 

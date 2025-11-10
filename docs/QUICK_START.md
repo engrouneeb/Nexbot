@@ -72,7 +72,7 @@ curl http://localhost:8000/api/v1/heartbeat
 docker exec chatbot-redis redis-cli ping
 
 # Check SQL Server
-docker exec chatbot-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Password123" -Q "SELECT 1"
+docker exec chatbot-sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -Q "SELECT 1"
 ```
 
 ### 4. Set Up Backend (.NET API)

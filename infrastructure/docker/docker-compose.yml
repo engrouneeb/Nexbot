@@ -33,19 +33,39 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=YourStrong@Passw0rd
-      - POSTGRES_DB=CalimaticChatbotDB
-      - POSTGRES_HOST_AUTH_METHOD=md5
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YourStrong@Passw0rd
+      POSTGRES_DB: CalimaticChatbotDB
     volumes:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - calimatic-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../../src/backend
+      dockerfile: ChatbotPlatform.API/Dockerfile
+    container_name: calimatic-api
+    platform: linux/arm64
+    ports:
+      - "5050:5050"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:5050
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      chromadb:
+        condition: service_started
+    restart: unless-stopped
     networks:
       - calimatic-network
 
